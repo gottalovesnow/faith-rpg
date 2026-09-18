@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#15121d">
+<title>Faith RPG — Boss Battle</title>
+<style>
+:root{--bg:#100e16;--panel:#181522;--card:#211d2d;--text:#f5f2fb;--muted:#aaa3b8;--accent:#d8b36a;--border:#373044;--good:#83c99a}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#100e16,#15111d);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:auto;padding:18px 14px 40px}.hero,.card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px}.hero h1{margin:0 0 4px;font-size:25px}.muted{color:var(--muted);font-size:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.stat{background:var(--card);border-radius:12px;padding:11px;text-align:center}.stat b{display:block;font-size:20px}.bar{height:10px;background:#332d3e;border-radius:99px;overflow:hidden;margin-top:10px}.fill{height:100%;background:var(--accent);width:0%;transition:.2s}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{width:100%;min-height:48px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);padding:10px;text-align:left;font-size:15px}.btn:active{transform:scale(.99)}.primary{background:var(--accent);color:#17131a;border:0;font-weight:750;text-align:center}.step{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--border);padding:12px 0}.step input{width:20px;height:20px;accent-color:var(--accent)}h2{font-size:18px;margin:0 0 10px}.verse{border-left:3px solid var(--accent);padding:4px 0 4px 12px;line-height:1.5}.hidden{display:none}.notice{color:var(--good);min-height:22px;margin-top:9px;font-size:14px}.danger{border-color:#735044}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}@media(max-width:420px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<main id="app">
+<section class="hero">
+  <div class="muted">⚔️ CHRISTIAN RPG</div>
+  <h1>Faithful Warrior</h1>
+  <div class="muted">The goal is the next faithful choice — not perfection.</div>
+  <div style="margin-top:14px;display:flex;justify-content:space-between;gap:10px">
+    <b>Level <span id="level">1</span></b><span><span id="xp">0</span> XP / <span id="next">100</span></span>
+  </div>
+  <div class="bar"><div class="fill" id="xpbar"></div></div>
+  <div class="stats">
+    <div class="stat"><b id="streak">0</b><span class="muted">🔥 Streak</span></div>
+    <div class="stat"><b id="wins">0</b><span class="muted">🏆 Wins</span></div>
+    <div class="stat"><b id="battles">0</b><span class="muted">⚔️ Battles</span></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>🚨 I'm tempted right now</h2>
+  <div class="muted" style="margin-bottom:10px">Choose what is driving the temptation.</div>
+  <div class="grid">
+    <button class="btn boss" data-boss="Lust">🔥 <b>Lust</b><br><span class="muted">Urges, fantasy, triggering content</span></button>
+    <button class="btn boss" data-boss="Boredom">🌀 <b>Boredom</b><br><span class="muted">Restlessness, idle time</span></button>
+    <button class="btn boss" data-boss="Loneliness">🌙 <b>Loneliness</b><br><span class="muted">Isolation, wanting comfort</span></button>
+    <button class="btn boss" data-boss="Stress">⛈️ <b>Stress</b><br><span class="muted">Pressure, escape, overwhelm</span></button>
+  </div>
+  <div id="battle" class="hidden" style="margin-top:14px"></div>
+</section>
+
+<section class="card">
+  <h2>📖 Scripture Challenge</h2>
+  <div class="verse"><b>1 Corinthians 10:13</b><br>God is faithful; he will not let you be tempted beyond what you can bear. When you are tempted, he will also provide a way out.</div>
+  <button id="scripture" class="btn primary" style="margin-top:12px">Complete Scripture Challenge · +15 XP</button>
+</section>
+
+<section class="card">
+  <h2>📜 Daily Quests</h2>
+  <div id="quests"></div>
+</section>
+
+<section class="card">
+  <h2>🙏 Quick Prayer</h2>
+  <div class="muted">Jesus, I bring this temptation to You. Give me strength for the next right choice. Help me leave the trigger, redirect my attention, and remember that I am not alone. Amen.</div>
+</section>
+
+<section class="card">
+  <h2>💾 Save & Reset</h2>
+  <div class="grid">
+    <button id="export" class="btn">Export Backup</button>
+    <button id="reset" class="btn danger">Reset Progress</button>
+  </div>
+  <div id="notice" class="notice" aria-live="polite"></div>
+</section>
+<div class="footer">Your progress is stored locally in this browser on this device.</div>
+</main>
+
+<script>
+(function(){
+const KEY="faith-rpg-v1";
+const defaultState={xp:0,wins:0,battles:0,streak:0,lastDay:"",scripture:false,quests:{}};
+let s=load();
+const quests=[
+["prayer","Morning prayer",10,"Pray briefly and give God your day."],
+["movement","Move your body",10,"Walk, stretch, exercise, or get outside."],
+["connection","Healthy connection",15,"Message, call, or spend time with someone."],
+["word","Word quest",15,"Read a short passage of Scripture attentively."]
+];
+const bosses={
+Lust:[
+["EXIT THE TRIGGER","Put the device/site/app down and physically change location."],
+["10-MINUTE ESCAPE","Set a 10-minute timer. Walk, shower, pray, or exercise."],
+["REDIRECT","Choose a concrete task that occupies your hands and attention."],
+["TRUTH","Flee from sexual immorality. — 1 Corinthians 6:18"]
+],
+Boredom:[
+["CHANGE STATE","Stand up and leave the room or go outside."],
+["MICRO-QUEST","Do one useful five-minute task."],
+["CREATE","Read, exercise, clean, learn, or make something."],
+["TRUTH","Whatever you do, work at it with all your heart. — Colossians 3:23"]
+],
+Loneliness:[
+["REACH OUT","Send one honest message to a trusted person."],
+["BE PRESENT","Go somewhere with healthy human activity around you."],
+["PRAY","Tell God plainly what you are feeling."],
+["TRUTH","I will never leave you nor forsake you. — Hebrews 13:5"]
+],
+Stress:[
+["PAUSE","Take ten slow breaths and unclench your body."],
+["DUMP THE LOAD","Write down what is stressing you and the next actionable step."],
+["RESTORE","Water, food, movement, sleep, or a short break."],
+["TRUTH","Cast all your anxiety on him because he cares for you. — 1 Peter 5:7"]
+]};
+function load(){try{return {...defaultState,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){return {...defaultState}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(s))}
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function render(){
+ const level=Math.floor(s.xp/100)+1, into=s.xp%100;
+ $("#level").textContent=level;$("#xp").textContent=s.xp;$("#next").textContent=level*100;
+ $("#xpbar").style.width=into+"%";$("#streak").textContent=s.streak;$("#wins").textContent=s.wins;$("#battles").textContent=s.battles;
+ renderQuests();
+}
+function $(x){return document.querySelector(x)}
+function msg(t){$("#notice").textContent=t;setTimeout(()=>{if($("#notice").textContent===t)$("#notice").textContent=""},2500)}
+function xp(n,why){s.xp+=n;save();render();msg("+"+n+" XP — "+why)}
+function updateStreak(){const t=today();if(s.lastDay!==t){s.streak+=1;s.lastDay=t;save()}}
+function renderQuests(){
+ $("#quests").innerHTML=quests.map(q=>`<label class="step"><input type="checkbox" data-q="${q[0]}" ${s.quests[q[0]]?'checked disabled':''}><span><b>${q[1]}</b><br><span class="muted">${q[3]} · +${q[2]} XP</span></span></label>`).join("");
+ document.querySelectorAll("[data-q]").forEach(el=>el.addEventListener("change",()=>{
+   if(el.checked&&!s.quests[el.dataset.q]){s.quests[el.dataset.q]=true;updateStreak();xp(quests.find(q=>q[0]===el.dataset.q)[2],"Daily quest completed")}
+ }));
+}
+document.querySelectorAll(".boss").forEach(b=>b.addEventListener("click",()=>{
+ const name=b.dataset.boss; s.battles++;save();render();
+ const steps=bosses[name];
+ $("#battle").classList.remove("hidden");
+ $("#battle").innerHTML=`<div class="card" style="margin:0"><div style="display:flex;justify-content:space-between"><b>⚔️ ${name} Boss Battle</b><span class="muted">Battle #${s.battles}</span></div><div id="steps"></div><button id="win" class="btn primary" style="margin-top:10px">I redirected successfully · Defeat Boss +25 XP</button></div>`;
+ $("#steps").innerHTML=steps.map((x,i)=>`<label class="step"><input type="checkbox" data-step="${i}"><span><b>${i+1}. ${x[0]}</b><br><span class="muted">${x[1]}</span></span></label>`).join("");
+ document.querySelectorAll("[data-step]").forEach(el=>el.addEventListener("change",()=>{if(el.checked)xp(10,"Boss action completed")}));
+ $("#win").addEventListener("click",()=>{s.wins++;updateStreak();save();xp(25,name+" boss defeated");$("#win").disabled=true;});
+}));
+$("#scripture").addEventListener("click",()=>{if(!s.scripture){s.scripture=true;updateStreak();save();xp(15,"Scripture challenge completed");$("#scripture").disabled=true;$("#scripture").textContent="✓ Scripture Challenge Complete"}});
+$("#export").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(s,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="faith-rpg-backup.json";a.click();URL.revokeObjectURL(url);msg("Backup exported.");
+});
+$("#reset").addEventListener("click",()=>{if(confirm("Reset all Faith RPG progress on this device?")){s={...defaultState};save();location.reload()}});
+render();
+})();
+</script>
+</body>
+</html>
