@@ -1,113 +1,236 @@
-<head>
-<link rel="icon" type="image/png" sizes="192x192" href="faith-rpg-icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="faith-rpg-icon-512.png">
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#15121d">
-<title>Faith RPG — Boss Battle</title>
+<meta name="theme-color" content="#050505">
+<title>Faith RPG</title>
+<link rel="icon" type="image/png" sizes="192x192" href="faith-rpg-icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="faith-rpg-icon-512.png">
 <style>
-:root{--bg:#100e16;--panel:#181522;--card:#211d2d;--text:#f5f2fb;--muted:#aaa3b8;--accent:#d8b36a;--border:#373044;--good:#83c99a}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#100e16,#15111d);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:auto;padding:18px 14px 40px}.hero,.card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px}.hero h1{margin:0 0 4px;font-size:25px}.muted{color:var(--muted);font-size:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.stat{background:var(--card);border-radius:12px;padding:11px;text-align:center}.stat b{display:block;font-size:20px}.bar{height:10px;background:#332d3e;border-radius:99px;overflow:hidden;margin-top:10px}.fill{height:100%;background:var(--accent);width:0%;transition:.2s}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{width:100%;min-height:48px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);padding:10px;text-align:left;font-size:15px}.btn:active{transform:scale(.99)}.primary{background:var(--accent);color:#17131a;border:0;font-weight:750;text-align:center}.step{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--border);padding:12px 0}.step input{width:20px;height:20px;accent-color:var(--accent)}h2{font-size:18px;margin:0 0 10px}.verse{border-left:3px solid var(--accent);padding:4px 0 4px 12px;line-height:1.5}.hidden{display:none}.notice{color:var(--good);min-height:22px;margin-top:9px;font-size:14px}.danger{border-color:#735044}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}@media(max-width:420px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr 1fr}}
+:root{--bg:#050505;--panel:#090909;--line:#777;--soft:#262626;--text:#f2efe7;--muted:#aaa69d;--paper:#eeeae0}
+*{box-sizing:border-box}html,body{margin:0;background:#000;color:var(--text);font-family:Georgia,"Times New Roman",serif}
+body{min-height:100vh}button,input,textarea{font:inherit}
+#app{max-width:430px;min-height:100vh;margin:auto;background:#050505;position:relative;overflow:hidden;padding-bottom:74px}
+.screen{display:none;min-height:calc(100vh - 74px);padding:16px 14px 22px}.screen.active{display:block}
+.screen.fade{animation:fade .18s ease}@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.top{height:34px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.top button{background:none;border:0;color:#eee;font-size:21px;padding:2px 5px}
+.title{font-size:15px;letter-spacing:.18em;text-transform:uppercase}
+.icon{font-family:Arial,sans-serif;font-size:18px}
+.kicker{text-align:center;font:10px Arial,sans-serif;letter-spacing:.25em;text-transform:uppercase;color:#ddd}
+.serif{font-family:Georgia,"Times New Roman",serif}
+.center{text-align:center}
+.rule{height:1px;background:#555;margin:14px 0}
+.star{font-size:43px;line-height:1;margin:5px 0 10px;text-shadow:0 0 12px #aaa}
+.logo{font-size:32px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 8px}
+.tag{font:10px Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c9c6be}
+.quote{font-size:12px;font-style:italic;line-height:1.5;text-align:center}
+.btn{width:100%;border:1px solid #aaa;background:#080808;color:#eee;padding:13px 14px;margin-top:10px;letter-spacing:.12em;text-transform:uppercase;font-size:11px;cursor:pointer}
+.btn.light{background:var(--paper);color:#050505;border-color:var(--paper)}
+.btn:active{transform:scale(.99)}
+.card{border:1px solid #666;background:#080808;padding:14px;margin:12px 0;position:relative}
+.card:before{content:"";position:absolute;inset:6px;border:1px solid #202020;pointer-events:none}
+.card>*{position:relative}
+.hero-art{height:185px;border:1px solid #666;margin-bottom:8px;position:relative;overflow:hidden;background:
+radial-gradient(circle at 50% 28%,#aaa 0 2%,transparent 2.5%),
+linear-gradient(145deg,transparent 38%,#292929 39% 49%,transparent 50%),
+linear-gradient(25deg,#171717 0 40%,#070707 41% 60%,#1c1c1c 61% 100%)}
+.hero-art:before{content:"✝";position:absolute;left:50%;top:16%;transform:translateX(-50%);font-size:48px;color:#eee}
+.hero-art:after{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff .55px,transparent .7px);background-size:4px 4px;opacity:.15}
+.avatar-art{height:155px;border:1px solid #666;background:
+radial-gradient(circle at 50% 48%,#888 0 1%,transparent 1.5%),
+linear-gradient(150deg,transparent 35%,#222 36% 55%,transparent 56%),
+linear-gradient(30deg,#1d1d1d,#050505 55%,#1b1b1b);position:relative}
+.avatar-art:before{content:"✝";position:absolute;left:50%;top:10%;transform:translateX(-50%);font-size:46px}
+.avatar-art:after{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff .5px,transparent .7px);background-size:4px 4px;opacity:.14}
+.levelrow{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-top:9px}
+.bar{height:7px;background:#0a0a0a;border:1px solid #aaa;margin:7px 0 4px}.bar i{display:block;height:100%;background:#eee;width:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #555;border-bottom:1px solid #555;margin:14px 0}
+.stat{padding:11px 5px;text-align:center;border-right:1px solid #444}.stat:last-child{border-right:0}.stat b{display:block;font-size:20px;font-weight:400}.stat span{font:9px Arial,sans-serif;letter-spacing:.12em;color:#aaa;text-transform:uppercase}
+.section-title{font-size:16px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px}
+.muted{font:11px Arial,sans-serif;color:#aaa;line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.boss{min-height:116px;text-align:center;padding:12px 7px}
+.boss .sym{font:25px Georgia,serif;display:block;margin-bottom:8px}.boss strong{display:block;font-size:15px;letter-spacing:.08em;text-transform:uppercase;font-weight:400}.boss small{display:block;font:10px Arial,sans-serif;color:#aaa;line-height:1.35;margin-top:6px}
+.health{display:flex;justify-content:space-between;font:10px Arial,sans-serif;color:#bbb;margin:6px 0}
+.battlebar{height:8px;border:1px solid #aaa;background:#050505}.battlebar i{display:block;height:100%;background:#eee;width:72%}
+.action{border:1px solid #555;padding:11px;margin-top:9px;font-size:11px;line-height:1.5}
+.quest{display:flex;align-items:center;gap:10px;border-bottom:1px solid #333;padding:12px 0}.quest:last-child{border-bottom:0}.check{width:20px;height:20px;border:1px solid #aaa;border-radius:50%;display:grid;place-items:center;flex:none}.quest.done .check:after{content:"✓";font-size:12px}.quest.done{opacity:.6}.quest b{font-size:12px;font-weight:400}.quest span{display:block;font:9px Arial,sans-serif;color:#aaa;margin-top:3px}.xp{margin-left:auto;font:10px Arial,sans-serif;white-space:nowrap}
+.verse{border-left:2px solid #eee;padding-left:12px;font-size:14px;line-height:1.65}.verse small{display:block;font:10px Arial,sans-serif;letter-spacing:.12em;margin-bottom:8px;color:#aaa}
+.listrow{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;padding:13px 0;font:12px Arial,sans-serif}.listrow:last-child{border-bottom:0}.chev{font-size:18px;color:#aaa}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:70px;background:#070707;border-top:1px solid #666;display:grid;grid-template-columns:repeat(5,1fr);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav{border:0;background:none;color:#777;font:8px Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase}.nav b{display:block;font-size:17px;margin-bottom:5px;color:#aaa;font-weight:400}.nav.active{color:#eee}.nav.active b{color:#fff}
+.splash{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:25px}.splash .hero-art{width:100%;height:260px;margin-top:22px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modal .card{max-width:380px;width:100%;text-align:center}
+textarea{width:100%;height:130px;background:#050505;color:#eee;border:1px solid #666;padding:12px;font-size:12px;resize:none}
+@media(max-width:360px){.logo{font-size:28px}.hero-art{height:165px}}
 </style>
 </head>
 <body>
-<main id="app">
-<section class="hero">
-  <div class="muted">⚔️ CHRISTIAN RPG</div>
-  <h1>Faithful Warrior</h1>
-  <div class="muted">The goal is the next faithful choice — not perfection.</div>
-  <div style="margin-top:14px;display:flex;justify-content:space-between;gap:10px">
-    <b>Level <span id="level">1</span></b><span><span id="xp">0</span> XP / <span id="next">100</span></span>
+<div id="app">
+
+<section id="splash" class="screen active splash">
+  <div class="star">✦</div><div class="logo">Faith RPG</div>
+  <div class="tag">The battle is spiritual — Ephesians 6:12</div>
+  <div class="hero-art"></div>
+  <button class="btn light" onclick="enterLobby()">Enter</button>
+</section>
+
+<section id="lobby" class="screen">
+  <div class="top"><button onclick="show('splash')">☰</button><div class="title">Lobby</div><button onclick="show('settings')">⚙</button></div>
+  <div class="hero-art"></div>
+  <div class="center">
+    <h1 class="serif" style="font-size:22px;font-weight:400;letter-spacing:.08em">Faithful Warrior</h1>
+    <div class="levelrow"><span>Level <b id="lobbyLevel">1</b></span><span><b id="lobbyXP">0</b> / 100 XP</span></div>
+    <div class="bar"><i id="lobbyBar"></i></div>
+    <button class="btn light" onclick="show('home')">Enter World</button>
   </div>
-  <div class="bar"><div class="fill" id="xpbar"></div></div>
-  <div class="stats">
-    <div class="stat"><b id="streak">0</b><span class="muted">🔥 Streak</span></div>
-    <div class="stat"><b id="wins">0</b><span class="muted">🏆 Wins</span></div>
-    <div class="stat"><b id="battles">0</b><span class="muted">⚔️ Battles</span></div>
+</section>
+
+<section id="home" class="screen">
+  <div class="top"><button onclick="show('lobby')">☰</button><div class="title">Home</div><button onclick="show('settings')">⚙</button></div>
+  <div class="quote">“With God, all things are possible.”<br><span>Matthew 19:26</span></div><div class="rule"></div>
+  <div class="stats"><div class="stat"><b id="hLevel">1</b><span>Level</span></div><div class="stat"><b id="hXP">0</b><span>XP</span></div><div class="stat"><b id="hStreak">0</b><span>Streak</span></div></div>
+  <div class="card"><div class="section-title">✝ &nbsp; Current Mission</div><div style="font-size:12px;line-height:1.5">Stand firm. Choose what is good.<br><span class="muted">Romans 12:2</span></div></div>
+  <div class="hero-art" style="height:145px"></div>
+  <button class="btn light" onclick="show('battle')">Enter Battle</button>
+</section>
+
+<section id="battle" class="screen">
+  <div class="top"><button onclick="show('home')">‹</button><div class="title">Battle</div><button onclick="show('settings')">⚙</button></div>
+  <div class="center"><div class="section-title">TEMPTATION</div><div class="muted">What is pulling at your heart today?</div></div>
+  <div class="grid" style="margin-top:12px">
+    <button class="btn boss" onclick="startBoss('Lust')"><span class="sym">♨</span><strong>Lust</strong><small>Urges, fantasy,<br>triggering content</small></button>
+    <button class="btn boss" onclick="startBoss('Boredom')"><span class="sym">◎</span><strong>Boredom</strong><small>Restlessness,<br>idle time</small></button>
+    <button class="btn boss" onclick="startBoss('Loneliness')"><span class="sym">☾</span><strong>Loneliness</strong><small>Isolation, wanting<br>comfort</small></button>
+    <button class="btn boss" onclick="startBoss('Stress')"><span class="sym">✣</span><strong>Stress</strong><small>Pressure, escape,<br>overwhelm</small></button>
+  </div>
+  <button id="engage" class="btn light" style="margin-top:12px" onclick="engageBoss()" disabled>Engage Boss</button>
+</section>
+
+<section id="boss" class="screen">
+  <div class="top"><button onclick="show('battle')">‹</button><div class="title">Battle</div><button onclick="show('settings')">⚙</button></div>
+  <div class="center"><div class="section-title" id="bossName">Lust</div><div class="muted">The enemy seeks to pull you away.</div></div>
+  <div class="avatar-art" style="margin-top:10px"></div>
+  <div class="health"><span>Boss Health</span><span id="bossHealthText">180 / 250</span></div><div class="battlebar"><i id="bossHealth"></i></div>
+  <div id="bossActions" class="action"></div>
+  <button class="btn light" onclick="fight()">⚔ Fight</button>
+  <button class="btn" onclick="show('home')">Run</button>
+</section>
+
+<section id="quests" class="screen">
+  <div class="top"><button onclick="show('home')">☰</button><div class="title">Quests</div><button onclick="show('settings')">⚙</button></div>
+  <div class="section-title">Daily Quests <span class="muted" style="float:right">Reset daily</span></div>
+  <div class="card" id="questList"></div>
+  <div class="card"><div class="section-title">♨ Streak <span style="float:right;font-size:10px">Day <span id="qDay">1</span> of 7</span></div><div class="muted">Keep going. Small steps build stronger faith.</div></div>
+</section>
+
+<section id="word" class="screen">
+  <div class="top"><button onclick="show('home')">‹</button><div class="title">Word</div><button onclick="show('settings')">⚙</button></div>
+  <div class="card"><div class="verse"><small>1 Corinthians 10:13</small>“No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear. But when you are tempted, he will also provide a way out so that you can endure it.”</div><button id="scriptureBtn" class="btn light" onclick="completeScripture()">Complete Challenge · +15 XP</button></div>
+  <div class="card"><div class="section-title">♧ Prayer</div><div class="muted">Jesus, I bring this temptation to You. Give me strength for the next right choice. Help me leave the trigger, redirect my attention, and remember that I am not alone. Amen.</div></div>
+</section>
+
+<section id="profile" class="screen">
+  <div class="top"><button onclick="show('home')">☰</button><div class="title">Profile</div><button onclick="show('settings')">⚙</button></div>
+  <div class="center"><div class="symbol star" style="font-size:40px">✦</div><div class="logo" style="font-size:20px">Faithful Warrior</div><div class="muted">Level <span id="pLevel">1</span></div></div>
+  <div class="bar"><i id="pBar"></i></div><div class="center muted" style="margin-top:6px"><span id="pXP">0</span> / 100 XP</div>
+  <div class="stats"><div class="stat"><b id="pStreak">0</b><span>Streak</span></div><div class="stat"><b id="pWins">0</b><span>Wins</span></div><div class="stat"><b id="pBattles">0</b><span>Battles</span></div></div>
+  <div class="card">
+    <div class="listrow" onclick="show('achievements')">🏆 &nbsp; Achievements <span class="chev">›</span></div>
+    <div class="listrow" onclick="exportData()">◉ &nbsp; Backup Progress <span class="chev">›</span></div>
+    <div class="listrow" onclick="show('journal')">✎ &nbsp; Journal <span class="chev">›</span></div>
+    <div class="listrow" onclick="show('settings')">⚙ &nbsp; Settings <span class="chev">›</span></div>
+    <div class="listrow" onclick="confirmReset()">↻ &nbsp; Reset Progress <span class="chev">›</span></div>
   </div>
 </section>
 
-<section class="card">
-  <h2>🚨 I'm tempted right now</h2>
-  <div class="muted" style="margin-bottom:10px">Choose what is driving the temptation.</div>
-  <div class="grid">
-    <button class="btn boss" data-boss="Lust">🔥 <b>Lust</b><br><span class="muted">Urges, fantasy, triggering content</span></button>
-    <button class="btn boss" data-boss="Boredom">🌀 <b>Boredom</b><br><span class="muted">Restlessness, idle time</span></button>
-    <button class="btn boss" data-boss="Loneliness">🌙 <b>Loneliness</b><br><span class="muted">Isolation, wanting comfort</span></button>
-    <button class="btn boss" data-boss="Stress">⛈️ <b>Stress</b><br><span class="muted">Pressure, escape, overwhelm</span></button>
+<section id="settings" class="screen">
+  <div class="top"><button onclick="show('profile')">‹</button><div class="title">Settings</div><span></span></div>
+  <div class="card">
+    <div class="listrow">◉ &nbsp; Sound <span>◉</span></div>
+    <div class="listrow">◉ &nbsp; Haptic Feedback <span>◉</span></div>
+    <div class="listrow">♧ &nbsp; Notifications <span>◉</span></div>
+    <div class="listrow">◉ &nbsp; Privacy Policy <span class="chev">›</span></div>
+    <div class="listrow">ⓘ &nbsp; About <span class="chev">›</span></div>
   </div>
-  <div id="battle" class="hidden" style="margin-top:14px"></div>
 </section>
 
-<section class="card">
-  <h2>📖 Scripture Challenge</h2>
-  <div class="verse"><b>1 Corinthians 10:13</b><br>God is faithful; he will not let you be tempted beyond what you can bear. When you are tempted, he will also provide a way out.</div>
-  <button id="scripture" class="btn primary" style="margin-top:12px">Complete Scripture Challenge · +15 XP</button>
+<section id="achievements" class="screen">
+  <div class="top"><button onclick="show('profile')">‹</button><div class="title">Achievements</div><span></span></div>
+  <div class="center"><div class="star">✦</div><div class="section-title">First Victory</div><div class="muted">Defeat your first temptation.<br>+25 XP</div><div class="bar" style="margin-top:18px"><i id="achBar"></i></div><div class="muted" style="margin-top:7px"><span id="achCount">0</span> / 1</div></div>
 </section>
 
-<section class="card">
-  <h2>📜 Daily Quests</h2>
-  <div id="quests"></div>
+<section id="journal" class="screen">
+  <div class="top"><button onclick="show('profile')">‹</button><div class="title">Journal</div><button onclick="show('settings')">⚙</button></div>
+  <div class="section-title">Write your thoughts, prayers, or what God is teaching you.</div>
+  <textarea id="journalText" maxlength="500" placeholder="Today I am grateful for..."></textarea>
+  <button class="btn" onclick="saveJournal()">Save Entry</button><div id="journalStatus" class="muted" style="margin-top:8px"></div>
 </section>
 
-<section class="card">
-  <h2>🙏 Quick Prayer</h2>
-  <div class="muted">Jesus, I bring this temptation to You. Give me strength for the next right choice. Help me leave the trigger, redirect my attention, and remember that I am not alone. Amen.</div>
-</section>
+<div id="resetModal" class="modal"><div class="card"><div class="star" style="font-size:34px">✦</div><div class="section-title">Reset Progress?</div><div class="muted">This will erase all your current progress and data. This action cannot be undone.</div><div class="grid" style="margin-top:12px"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn light" onclick="resetAll()">Reset</button></div></div></div>
 
-<section class="card">
-  <h2>💾 Save & Reset</h2>
-  <div class="grid">
-    <button id="export" class="btn">Export Backup</button>
-    <button id="reset" class="btn danger">Reset Progress</button>
-  </div>
-  <div id="notice" class="notice" aria-live="polite"></div>
-</section>
-<div class="footer">Your progress is stored locally in this browser on this device.</div>
-</main>
+<nav class="bottom">
+  <button class="nav active" data-nav="home" onclick="show('home')"><b>⌂</b>Home</button>
+  <button class="nav" data-nav="battle" onclick="show('battle')"><b>⚔</b>Battle</button>
+  <button class="nav" data-nav="quests" onclick="show('quests')"><b>▤</b>Quests</button>
+  <button class="nav" data-nav="word" onclick="show('word')"><b>♜</b>Word</button>
+  <button class="nav" data-nav="profile" onclick="show('profile')"><b>♙</b>Profile</button>
+</nav>
+</div>
 
 <script>
-(function(){
-const KEY="faith-rpg-v1";
-const defaultState={xp:0,wins:0,battles:0,streak:0,lastDay:"",scripture:false,quests:{}};
-let s=load();
-const quests=[
-["prayer","Morning prayer",10,"Pray briefly and give God your day."],
-["movement","Move your body",10,"Walk, stretch, exercise, or get outside."],
-["connection","Healthy connection",15,"Message, call, or spend time with someone."],
-["word","Word quest",15,"Read a short passage of Scripture attentively."]
+const KEY="faith-rpg-v2";
+const defaultState={xp:0,wins:0,battles:0,streak:0,lastDay:"",scripture:false,quests:{},journal:""};
+let state=load(),selectedBoss="",bossHP=250;
+const bossText={
+ Lust:["Take a deep breath.","You remember who you are in Christ.","The temptation loses strength when you leave the trigger."],
+ Boredom:["Change your environment.","Do one useful thing for five minutes.","Choose creation over consumption."],
+ Loneliness:["You are not abandoned.","Reach out to someone safe.","Pray honestly instead of isolating."],
+ Stress:["Slow your breathing.","Give the pressure to God.","Choose the next small action, not escape."]
+};
+const daily=[
+ ["Read Scripture",15,"scripture"],
+ ["Pray for 5 minutes",10,"prayer"],
+ ["Avoid a trigger",10,"trigger"],
+ ["Do something kind",10,"kind"],
+ ["Journal your thoughts",10,"journal"]
 ];
-const bosses={
-Lust:[
-["EXIT THE TRIGGER","Put the device/site/app down and physically change location."],
-["10-MINUTE ESCAPE","Set a 10-minute timer. Walk, shower, pray, or exercise."],
-["REDIRECT","Choose a concrete task that occupies your hands and attention."],
-["TRUTH","Flee from sexual immorality. — 1 Corinthians 6:18"]
-],
-Boredom:[
-["CHANGE STATE","Stand up and leave the room or go outside."],
-["MICRO-QUEST","Do one useful five-minute task."],
-["CREATE","Read, exercise, clean, learn, or make something."],
-["TRUTH","Whatever you do, work at it with all your heart. — Colossians 3:23"]
-],
-Loneliness:[
-["REACH OUT","Send one honest message to a trusted person."],
-["BE PRESENT","Go somewhere with healthy human activity around you."],
-["PRAY","Tell God plainly what you are feeling."],
-["TRUTH","I will never leave you nor forsake you. — Hebrews 13:5"]
-],
-Stress:[
-["PAUSE","Take ten slow breaths and unclench your body."],
-["DUMP THE LOAD","Write down what is stressing you and the next actionable step."],
-["RESTORE","Water, food, movement, sleep, or a short break."],
-["TRUTH","Cast all your anxiety on him because he cares for you. — 1 Peter 5:7"]
-]};
 function load(){try{return {...defaultState,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){return {...defaultState}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(s))}
-function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function day(){let d=new Date();return d.toISOString().slice(0,10)}
+function streak(){if(state.lastDay!==day()){state.streak++;state.lastDay=day();save()}}
+function level(){return Math.floor(state.xp/100)+1}
+function addXP(n){state.xp+=n;save();render()}
+function show(id){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ const el=document.getElementById(id);if(el){el.classList.add("active");el.classList.remove("fade");void el.offsetWidth;el.classList.add("fade")}
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.nav===id));
+ window.scrollTo(0,0);
+}
+function enterLobby(){show("lobby")}
+function startBoss(name){selectedBoss=name;document.getElementById("engage").disabled=false;document.getElementById("engage").textContent="Engage "+name}
+function engageBoss(){if(!selectedBoss)return;bossHP=250;document.getElementById("bossName").textContent=selectedBoss;document.getElementById("bossActions").innerHTML=bossText[selectedBoss].map(x=>"> "+x).join("<br>");updateBoss();show("boss")}
+function updateBoss(){document.getElementById("bossHealthText").textContent=bossHP+" / 250";document.getElementById("bossHealth").style.width=(bossHP/250*100)+"%"}
+function fight(){if(!selectedBoss)return;bossHP=Math.max(0,bossHP-50);state.battles++;addXP(10);updateBoss();if(bossHP===0){state.wins++;streak();addXP(25);alert("Boss defeated. +25 XP");render()}}
+function completeScripture(){if(!state.scripture){state.scripture=true;streak();addXP(15);document.getElementById("scriptureBtn").textContent="✓ Challenge Complete";document.getElementById("scriptureBtn").disabled=true}}
+function completeQuest(key,xp){if(state.quests[key])return;state.quests[key]=true;streak();addXP(xp);render()}
+function renderQuests(){document.getElementById("questList").innerHTML=daily.map(q=>`<div class="quest ${state.quests[q[2]]?'done':''}" onclick="completeQuest('${q[2]}',${q[1]})"><div class="check"></div><div><b>${q[0]}</b><span>Daily objective</span></div><div class="xp">+${q[1]} XP</div></div>`).join("")}
+function render(){
+ const lv=level(),cur=state.xp%100;
+ ["lobbyLevel","hLevel","pLevel"].forEach(id=>document.getElementById(id).textContent=lv);
+ ["lobbyXP","hXP","pXP"].forEach(id=>document.getElementById(id).textContent=state.xp);
+ ["hStreak","pStreak"].forEach(id=>document.getElementById(id).textContent=state.streak);
+ document.getElementById("pWins").textContent=state.wins;document.getElementById("pBattles").textContent=state.battles;
+ ["lobbyBar","pBar"].forEach(id=>document.getElementById(id).style.width=cur+"%");
+ document.getElementById("qDay").textContent=Math.min(7,state.streak+1);
+ document.getElementById("achCount").textContent=state.wins>0?1:0;document.getElementById("achBar").style.width=(state.wins>0?100:0)+"%";
+ renderQuests();
+ document.getElementById("journalText").value=state.journal||"";
+ if(state.scripture){document.getElementById("scriptureBtn").textContent="✓ Challenge Complete";document.getElementById("scriptureBtn").disabled=true}
+}
+function exportData(){const blob=new Blob([JSON.stringiffunction today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function render(){
  const level=Math.floor(s.xp/100)+1, into=s.xp%100;
  $("#level").textContent=level;$("#xp").textContent=s.xp;$("#next").textContent=level*100;
